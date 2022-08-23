@@ -61,7 +61,13 @@ export class Highlighter {
   private async RenderTokens(content: string, lang: string): Promise<ThemedTokens[]> {
 
     const highlighter = await this.GetHighlighter();
+    const languages = highlighter.getLoadedLanguages() as string[];
 
+    if (!languages.includes(lang)) {
+      console.warn(`language definition not found for ${lang}`);
+      lang = undefined;
+    }
+    
     return (this.config.themes||[]).map(name => {
       const theme = highlighter.getTheme(name);
       return {
@@ -113,7 +119,40 @@ export class Highlighter {
    * composite method for rendering tokens and then formatting
    */
   public async Highlight(text: string, language: string, meta: Meta = {}) {
+
+    // better handling for blocks with no language specifier.  we want 
+    // to maintain our node structure, so the styling doesn't change. 
+    // we'll add our specific nodes and then reflect back the original source.
+
+    // TODO: have a default language in config?
+
+    if (!language || language === 'unknown') {
+      return await this.NullFormat(text, meta);
+    }
+
     return this.FormatTokens(await this.RenderTokens(text, language), meta);
+  }
+
+  /**
+   * if there's no language, don't render tokens; just reflect back
+   * the original text. 
+   */
+  private async NullFormat(text: string, meta: Meta = {}) {
+
+    const highlighter = await this.GetHighlighter();
+
+    const rendered = (this.config.themes || []).map(name => {
+      const theme = highlighter.getTheme(name);
+      const root = h('pre', { class: ['shiki', theme.name], style: { 'background-color': theme.bg }}, 
+          h('div', { class: 'code-container' }, 
+          h('code', { style: { 'color': theme.fg } }, text
+        )));
+
+      return root;
+    });
+
+    return rendered;
+
   }
 
   /**

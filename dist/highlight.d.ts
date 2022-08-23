@@ -36,6 +36,11 @@ export declare class Highlighter {
      */
     Highlight(text: string, language: string, meta?: Meta): Promise<any[]>;
     /**
+     * if there's no language, don't render tokens; just reflect back
+     * the original text.
+     */
+    private NullFormat;
+    /**
      * format tokens into a block. we return an array of <pre/> elements
      */
     private FormatTokens;
