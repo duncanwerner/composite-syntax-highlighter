@@ -24,7 +24,7 @@ postprocessing. So this library adds the scopes to the generated nodes (again
 to the dataSet) prior to postprocessing. 
 
 Another thing we do is show/hide certain lines. Shiki is too smart: it won't 
-highlight this properly
+highlight `public` as a modifier here:
 
 <pre>
 ```ts
@@ -32,11 +32,11 @@ public field = 100;
 ```
 </pre>
 
-Because `public` only makes sense in a class context. It will highlight this:
+because `public` only makes sense in a class context. It will highlight this:
 
 <pre>
 ```ts
-class FakeClass {
+class MyClass {
 public field = 100;
 }
 ```
