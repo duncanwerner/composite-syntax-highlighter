@@ -1,0 +1,16 @@
+{
+  "type": "module",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@types/mdast": "^3.0.10",
+    "hast": "^1.0.0",
+    "hast-util-to-html": "^8.0.3",
+    "hastscript": "^7.0.2",
+    "he": "^1.2.0",
+    "mdast": "^3.0.0",
+    "shiki": "^0.11.1",
+    "typescript": "^4.7.4"
+  }
+}
