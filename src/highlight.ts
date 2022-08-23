@@ -34,10 +34,10 @@ export class Highlighter {
   /** why is this private? */
   private config: HighlighterOptions = Highlighter.default_config;
 
-  constructor() {
-    console.info('instance');
-  }
-
+  /** 
+   * set the shiki config. this has to happen before it's used,
+   * because we will cache the highlighter instance.
+   */
   public SetConfig(config: HighlighterOptions) {
     this.config = config;
   };
@@ -49,8 +49,6 @@ export class Highlighter {
    */
   private async GetHighlighter(): Promise<ShikiHighlighter> {
     if (!this.cached_highlighter) {
-      console.info('get highlighter');
-
       this.cached_highlighter = await getHighlighter(this.config);
     }
     return this.cached_highlighter;
