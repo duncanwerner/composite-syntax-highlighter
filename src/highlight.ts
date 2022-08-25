@@ -164,7 +164,7 @@ export class Highlighter {
 
       const { theme, lines } = block;
   
-      let root;
+      let root: HastElement|undefined;
     
       if (typeof meta.inline !== 'undefined' && meta.inline !== false) {
         const index = (typeof meta.inline === 'number') ? meta.inline : 0;
@@ -190,7 +190,7 @@ export class Highlighter {
     
       }
     
-      if (meta.postprocess) {
+      if (root && meta.postprocess) {
           for (const step of meta.postprocess) {
           const func = step();
           func.call(0, root);

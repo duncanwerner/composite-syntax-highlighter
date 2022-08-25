@@ -1,5 +1,6 @@
 import type { HighlighterOptions } from 'shiki';
 import type { Meta } from './meta';
+import type { Element as HastElement } from 'hast';
 /**
  * this is a class so we can isolate instances that have (possibly)
  * different configs. a single config can have multiple themes, so
@@ -34,7 +35,7 @@ export declare class Highlighter {
     /**
      * composite method for rendering tokens and then formatting
      */
-    Highlight(text: string, language: string, meta?: Meta): Promise<any[]>;
+    Highlight(text: string, language: string, meta?: Meta): Promise<HastElement[]>;
     /**
      * if there's no language, don't render tokens; just reflect back
      * the original text.

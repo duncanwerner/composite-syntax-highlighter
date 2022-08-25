@@ -135,7 +135,7 @@ export class Highlighter {
                     return this.FormatLine(line, theme, highlight ? 'highlight-line' : undefined);
                 }))));
             }
-            if (meta.postprocess) {
+            if (root && meta.postprocess) {
                 for (const step of meta.postprocess) {
                     const func = step();
                     func.call(0, root);

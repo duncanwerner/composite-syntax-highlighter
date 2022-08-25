@@ -1,4 +1,11 @@
 
+import type { Element as HastElement } from 'hast';
+
+/**
+ * I don't think that's necessarily the right type...
+ */
+export type TreeProcessor = (root: HastElement) => void;
+
 /**
  * metadata object for passing to parser
  */
@@ -23,7 +30,7 @@ export interface Meta {
    * postprocessors; these are (basically) rehype plugins, but only operate
    * on the generated code nodes. 
    */
-  postprocess?: Array<() => (tree: any) => void>;
+  postprocess?: Array<() => TreeProcessor>;
 
 }
 
