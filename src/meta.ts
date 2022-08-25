@@ -8,17 +8,21 @@ export type TreeProcessor = (root: HastElement) => void;
 
 /**
  * metadata object for passing to parser
+ * 
+ * why is ts complaining about setting explicit undefineds on
+ * the optional properties? that's new to me. also I don't like it.
+ * 
  */
 export interface Meta {
 
   /** hide selected lines (0-based) */
-  hide?: number[];
+  hide?: number[]|undefined;
 
   /** show only selected lines (0-based) */
-  show?: number[];
+  show?: number[]|undefined;
 
   /** add a highlight class to the selected lines */
-  highlight?: number[];
+  highlight?: number[]|undefined;
 
   /** leave scopes in as data-scope attribute */
   preserve_scopes?: boolean;
