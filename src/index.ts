@@ -2,7 +2,7 @@
 import { Highlighter } from './highlight.js';
 
 /** remark/rehype plugin */
-export { CompositePlugin } from './plugins.js';
+export { CompositePlugin, CombinedPlugin } from './plugins.js';
 
 /** meta type for advanced formatting */
 export type { Meta } from './meta.js';

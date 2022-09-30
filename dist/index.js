@@ -1,6 +1,6 @@
 import { Highlighter } from './highlight.js';
 /** remark/rehype plugin */
-export { CompositePlugin } from './plugins.js';
+export { CompositePlugin, CombinedPlugin } from './plugins.js';
 /** direct calls for special rendering */
 export { Highlighter } from './highlight.js';
 /**

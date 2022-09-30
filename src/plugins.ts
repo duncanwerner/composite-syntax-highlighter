@@ -20,6 +20,39 @@ import { toHtml as render_html } from 'hast-util-to-html'
 const highlighter = new Highlighter();
 
 /**
+ * single-instance plugin. does the syntax highlighting into a 
+ * HAST tree, applies any postprocessors, then pastes the output
+ * html into markdown. this is a remark plugin.
+ *  
+ * @see README
+ */
+export const CombinedPlugin = (config?: HighlighterOptions) => {
+
+  if (config) {
+    highlighter.SetConfig(config);
+  }
+
+  return async (tree: MdastParent) => {
+
+    tree.children = await Promise.all(tree.children.map(async (child) => {
+      if (child.type === 'code') {
+
+        const language = child.lang || 'unknown';
+        const meta = child.meta ? ParseMeta(child.meta) : undefined;
+        const formatted = await highlighter.Highlight((he as any).default.decode(child.value), language, meta);
+
+        return {
+          type: 'html',
+          value: render_html(formatted),
+        }
+
+      }
+      return child;
+    }));
+  };
+};
+
+/**
  * this is a remark plugin that handles code blocks, but doesn't 
  * format them: it only adds some metadata so we can process it 
  * later.

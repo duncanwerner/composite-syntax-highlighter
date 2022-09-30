@@ -53,6 +53,11 @@ public field = 100;
 ```
 </pre>
 
+## Update
 
+OK, so there's really no need to use both plugins. Especially since we pass
+our own postprocessors to the highlight routine. So I added CombinedPlugin,
+which does highlighting as a single pass as a remark plugin. Less elegant, 
+maybe, but does the job.
 
 
