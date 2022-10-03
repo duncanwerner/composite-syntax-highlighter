@@ -5,6 +5,7 @@ import type { HighlighterOptions } from 'shiki';
 
 import type { Root as HastRoot, Content as HastContent } from 'hast';
 import type { Parent as MdastParent } from 'mdast';
+import * as Mdast from 'mdast';
 
 import * as he from 'he';
 
@@ -20,10 +21,19 @@ import { toHtml as render_html } from 'hast-util-to-html'
 const highlighter = new Highlighter();
 
 /**
+ * AFAICT there's no consistent interface that supports nonstandard
+ * types (could be wrong). Astro uses some nonstandard types that have
+ * trees.
+ */
+type ExtendedNode = Mdast.Content & { children?: ExtendedNode[] };
+
+/**
  * single-instance plugin. does the syntax highlighting into a 
  * HAST tree, applies any postprocessors, then pastes the output
  * html into markdown. this is a remark plugin.
  *  
+ * update to recurse over trees (is there a visitor we could use instead?)
+ * 
  * @see README
  */
 export const CombinedPlugin = (config?: HighlighterOptions) => {
@@ -32,24 +42,33 @@ export const CombinedPlugin = (config?: HighlighterOptions) => {
     highlighter.SetConfig(config);
   }
 
-  return async (tree: MdastParent) => {
+  const HighlightNode = async (child: Mdast.Code): Promise<Mdast.HTML> => {
+    const language = child.lang || 'unknown';
+    const meta = child.meta ? ParseMeta(child.meta) : undefined;
+    const formatted = await highlighter.Highlight((he as any).default.decode(child.value), language, meta);
 
-    tree.children = await Promise.all(tree.children.map(async (child) => {
-      if (child.type === 'code') {
+    return {
+      type: 'html',
+      value: render_html(formatted),
+    }
+  };
 
-        const language = child.lang || 'unknown';
-        const meta = child.meta ? ParseMeta(child.meta) : undefined;
-        const formatted = await highlighter.Highlight((he as any).default.decode(child.value), language, meta);
-
-        return {
-          type: 'html',
-          value: render_html(formatted),
-        }
-
+  const ProcessTree = async (nodes: ExtendedNode[]) => {
+    return Promise.all(nodes.map(async node => {
+      if (node.type === 'code') {
+        return await HighlightNode(node);
       }
-      return child;
+      if (node.children) {
+        node.children = await ProcessTree(node.children);
+      }
+      return node;
     }));
   };
+
+  return async (tree: Mdast.Parent) => {
+    tree.children = await ProcessTree(tree.children);
+  };
+
 };
 
 /**

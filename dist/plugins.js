@@ -13,25 +13,36 @@ const highlighter = new Highlighter();
  * HAST tree, applies any postprocessors, then pastes the output
  * html into markdown. this is a remark plugin.
  *
+ * update to recurse over trees (is there a visitor we could use instead?)
+ *
  * @see README
  */
 export const CombinedPlugin = (config) => {
     if (config) {
         highlighter.SetConfig(config);
     }
-    return async (tree) => {
-        tree.children = await Promise.all(tree.children.map(async (child) => {
-            if (child.type === 'code') {
-                const language = child.lang || 'unknown';
-                const meta = child.meta ? ParseMeta(child.meta) : undefined;
-                const formatted = await highlighter.Highlight(he.default.decode(child.value), language, meta);
-                return {
-                    type: 'html',
-                    value: render_html(formatted),
-                };
+    const HighlightNode = async (child) => {
+        const language = child.lang || 'unknown';
+        const meta = child.meta ? ParseMeta(child.meta) : undefined;
+        const formatted = await highlighter.Highlight(he.default.decode(child.value), language, meta);
+        return {
+            type: 'html',
+            value: render_html(formatted),
+        };
+    };
+    const ProcessTree = async (nodes) => {
+        return Promise.all(nodes.map(async (node) => {
+            if (node.type === 'code') {
+                return await HighlightNode(node);
             }
-            return child;
+            if (node.children) {
+                node.children = await ProcessTree(node.children);
+            }
+            return node;
         }));
+    };
+    return async (tree) => {
+        tree.children = await ProcessTree(tree.children);
     };
 };
 /**
