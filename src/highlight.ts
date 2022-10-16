@@ -43,21 +43,34 @@ export class Highlighter {
    * flush the cached instance here.
    */
   public SetConfig(config: HighlighterOptions) {
+
+    // if the config hasn't changed we don't have to flush 
+    // the cached instance
+
+    if (this.cached_highlighter &&
+        (JSON.stringify(this.config) === JSON.stringify(config))) {
+      return;
+    }
+
     this.config = config;
     this.cached_highlighter = undefined;
-  };
+
+  }
 
   /**
    * get highlighter, lazily cached. we don't check for changes
    * in config, it's assumed it will be constant. at a minimum we 
    * could error?
    */
-  private async GetHighlighter(): Promise<ShikiHighlighter> {
+  private async GetHighlighter(config?: HighlighterOptions): Promise<ShikiHighlighter> {
+    if (config) {
+      this.SetConfig(config);
+    }
     if (!this.cached_highlighter) {
       this.cached_highlighter = await getHighlighter(this.config);
     }
     return this.cached_highlighter;
-  };
+  }
 
   /**
    * render to tokens, preserving scopes
@@ -81,7 +94,7 @@ export class Highlighter {
       };
     });
 
-  };
+  }
 
   private FormatLine(line: IThemedToken[] = [], theme: IShikiTheme, line_classes = '') {
 
