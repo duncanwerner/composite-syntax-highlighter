@@ -14,3 +14,5 @@ export const GetInstance = () => {
     }
     return singleton;
 };
+/** pass through to simplify access */
+export { toShikiTheme } from 'shiki';

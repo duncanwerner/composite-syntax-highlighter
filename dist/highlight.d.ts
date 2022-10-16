@@ -18,6 +18,10 @@ export declare class Highlighter {
     /**
      * set the shiki config. this has to happen before it's used,
      * because we will cache the highlighter instance.
+     *
+     * actually if we want to support changing configs at runtime,
+     * which is what can happen in svelte (for example), we should
+     * flush the cached instance here.
      */
     SetConfig(config: HighlighterOptions): void;
     /**
