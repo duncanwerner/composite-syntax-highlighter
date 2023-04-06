@@ -136,7 +136,11 @@ export class Highlighter {
                 root = h('div', { class: ['shiki', theme.name] }, [this.FormatLine(lines[index], theme)]);
             }
             else {
-                root = h('pre', { class: ['shiki', theme.name], style: { 'background-color': theme.bg } }, h('div', { class: 'code-container' }, h('code', {}, lines.map((line, index) => {
+                root = h('pre', {
+                    class: ['shiki', theme.name],
+                    style: { 'background-color': theme.bg },
+                    ...(meta.data_attributes || {}),
+                }, h('div', { class: 'code-container' }, h('code', {}, lines.map((line, index) => {
                     // can explicitly show lines, or explicitly hide lines
                     if ((meta.show && !meta.show.includes(index))
                         || (meta.hide && meta.hide.includes(index))) {

@@ -8,27 +8,26 @@ export type TreeProcessor = (root: HastElement) => void;
 
 /**
  * metadata object for passing to parser
- * 
- * why is ts complaining about setting explicit undefineds on
- * the optional properties? that's new to me. also I don't like it.
- * 
  */
 export interface Meta {
 
   /** hide selected lines (0-based) */
-  hide?: number[]|undefined;
+  hide?: number[];
 
   /** show only selected lines (0-based) */
-  show?: number[]|undefined;
+  show?: number[];
 
   /** add a highlight class to the selected lines */
-  highlight?: number[]|undefined;
+  highlight?: number[];
 
   /** leave scopes in as data-scope attribute */
   preserve_scopes?: boolean;
 
   /** inline code. can be a line number if the actual text is multi-line */
   inline?: boolean | number;
+
+  /** optional data-* attributes */
+  data_attributes?: Record<string, string|true>;
 
   /** 
    * postprocessors; these are (basically) rehype plugins, but only operate
@@ -107,7 +106,7 @@ export const ParseMeta = (meta: string): Meta => {
       continue;
     }
 
-    if (/=/.test(part)) {
+    if (/=/.test(part) || /^data-[a-z1-9A-Z]*/.test(part)) {
       const [key, value] = part.split('=').map(text => text.trim());
       switch (key) {
         case 'highlight':
@@ -121,6 +120,22 @@ export const ParseMeta = (meta: string): Meta => {
         case 'hide':
           result.hide = ParseArrayValue(value);
           continue;
+
+        default:
+          if (/^data-[a-z1-9A-Z]*/.test(key)) {
+            let datavalue: string|true = value || true;
+            if (!result.data_attributes) {
+              result.data_attributes = {};
+            }
+            if (typeof datavalue === 'string') {
+              if (/^".*"$/.test(datavalue) || /^'.*'$/.test(datavalue)) {
+                datavalue = datavalue.substring(1, datavalue.length - 1);
+              }
+            }
+            result.data_attributes[key] = datavalue;
+            continue;
+          }
+
       }
       console.info({key, value});
     }

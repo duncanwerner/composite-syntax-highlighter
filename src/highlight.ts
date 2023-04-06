@@ -190,7 +190,11 @@ export class Highlighter {
       }
       else {
 
-        root = h('pre', { class: ['shiki', theme.name], style: { 'background-color': theme.bg }}, 
+        root = h('pre', { 
+                  class: ['shiki', theme.name], 
+                  style: { 'background-color': theme.bg },
+                  ...(meta.data_attributes||{}),
+                }, 
                 h('div', { class: 'code-container' }, 
                   h('code', {}, lines.map((line, index) => {
 

@@ -56,7 +56,7 @@ export const ParseMeta = (meta) => {
             result.preserve_scopes = true;
             continue;
         }
-        if (/=/.test(part)) {
+        if (/=/.test(part) || /^data-[a-z1-9A-Z]*/.test(part)) {
             const [key, value] = part.split('=').map(text => text.trim());
             switch (key) {
                 case 'highlight':
@@ -68,6 +68,20 @@ export const ParseMeta = (meta) => {
                 case 'hide':
                     result.hide = ParseArrayValue(value);
                     continue;
+                default:
+                    if (/^data-[a-z1-9A-Z]*/.test(key)) {
+                        let datavalue = value || true;
+                        if (!result.data_attributes) {
+                            result.data_attributes = {};
+                        }
+                        if (typeof datavalue === 'string') {
+                            if (/^".*"$/.test(datavalue) || /^'.*'$/.test(datavalue)) {
+                                datavalue = datavalue.substring(1, datavalue.length - 1);
+                            }
+                        }
+                        result.data_attributes[key] = datavalue;
+                        continue;
+                    }
             }
             console.info({ key, value });
         }
